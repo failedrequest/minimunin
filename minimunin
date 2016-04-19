@@ -1,0 +1,211 @@
+#!/bin/sh
+#
+# This script was written by erdgeist@erdgeist.org
+# The code is released under the beer ware license, this means do whatever you
+# want with it, as long as you leave this notice along with the code.
+# Should we meet some day and you find the code is worth it, let's enjoy a beer
+# together.
+
+PLUGIN_DIR=/opt/local/etc/munin/plugins
+CONFIG_DIR=/opt/local/etc/munin/configs
+BUILTIN="processes load iostat uptime"
+
+# list plugins, read configs
+PLUGINS=$(/usr/bin/find ${PLUGIN_DIR} \( -type l -or -type f \) -not -name '*_' -exec basename {} \; 2> /dev/null | /usr/bin/xargs)
+CONFIGS=$(/usr/bin/find ${CONFIG_DIR} -type f -exec /usr/bin/grep -v -e ^\# -e ^$ {} \; -exec /bin/echo [] \; 2> /dev/null)
+
+main() {
+    # print banner
+    printf "# munin node at %s\n" "$(/bin/hostname)"
+
+    # read commands in loop
+    while read -r command arg; do
+
+        # chomp and sanitize variables
+        command=$(printf %s "${command}" | /usr/bin/tr -cd '[:alnum:]_-. ')
+        arg=$(printf %s "${arg}" | /usr/bin/tr -cd '[:alnum:]_-. ')
+
+        # printf "%s %s\n" "$command" "$arg" >> /var/log/minimunin.log
+        # dispatch commands
+        case ${command} in
+            list)
+                printf "%s\n" "${BUILTIN} ${PLUGINS}"
+                ;;
+            fetch)
+                print_fetch ${arg}; printf ".\n"
+                ;;
+            config)
+                print_config ${arg}; printf ".\n"
+                ;;
+            quit)
+                exit 0
+                ;;
+            *)
+                 printf "# Unknown command %s.\n" "${command}"
+                 # printf %s ${command} | hexdump -C >> /var/log/minimunin.log
+                 ;;
+        esac
+    done
+}
+
+print_fetch() {
+# see if we're serving a plugin
+_plugin=$1
+call_plugin ${_plugin} fetch && return 0
+
+# if not, let our builtins answer
+case ${_plugin} in
+
+load)
+    printf "load.value %s\n"     $(uptime | awk '{print $(NF-2)}'|sed 's/,//g')
+    ;;
+uptime)
+      printf "uptime.value %d\n"   $(kstat -p unix:0:system_misc:boot_time | nawk '{printf "%d\n", srand()-$2}')
+    ;;
+processes)
+    printf "processes.value %d\n" $(/usr/bin/ps | /usr/bin/wc -l)
+    printf "lwp.value %d\n" $(/usr/bin/ps -elcL| wc -l)
+    printf "maxprocesses.value %d\n" $(echo max_nprocs/D | mdb -k  |awk '/[0-9].*/ {print $NF}')
+    ;;
+iostat)
+    for d in $(/usr/bin/iostat -xz | awk '{print $1}' |egrep  -v 'device|extended'| /usr/bin/xargs); do
+        set -- $(/usr/bin/iostat -Idx ${d} | /usr/bin/tail -n 1 | /usr/bin/xargs)
+        printf "${d}_read.value %d\n${d}_write.value %d\n" "${4%.*}" "${5%.*}"
+    done
+    ;;
+*)
+    printf "# Unknown plugin %s.\n" "${_plugin}"
+    ;;
+esac
+}
+
+print_config() {
+_plugin=$1
+# see if we're configuring a plugin
+call_plugin ${_plugin} config && return 0
+
+# if not, execute built in commands
+case ${_plugin} in
+load)
+cat <<-EOF
+	graph_title Load average
+	graph_info The load average of the machine describes how many processes are in the run-queue (scheduled to run "immediately").
+	graph_category system
+	graph_args --base 1000 -l 0
+	graph_vlabel load
+	graph_scale no
+	load.label load
+	load.info Average load for the last five minutes.
+	load.warning 10
+	load.critical 120
+EOF
+;;
+iostat)
+    drives=$(/usr/bin/iostat -xz | awk '{print $1}' |egrep  -v 'device|extended'| /usr/bin/xargs)
+cat <<-EOF
+	graph_title IOstat by bytes
+	graph_args --base 1024 -l 0
+	graph_vlabel MB per second read+written
+	graph_category disk
+	graph_info This graph shows the I/O to and from block devices
+EOF
+    printf "graph_order"
+for d in ${drives}; do printf " %s_read %s_write" "$d" "$d"; done
+    printf "\n"
+for d in ${drives}; do
+    cat <<-EOF
+		${d}_read.label ${d}
+		${d}_read.type DERIVE
+		${d}_read.max 2000
+		${d}_read.min 0
+		${d}_read.graph no
+		${d}_write.label ${d}
+		${d}_write.info I/O on device ${d}
+		${d}_write.type DERIVE
+		${d}_write.max 2000
+		${d}_write.min 0
+		${d}_write.negative ${d}_read
+	EOF
+done
+;;
+uptime)
+cat <<-EOF
+	graph_title Uptime
+	graph_args --base 1000 -l 0
+	graph_vlabel uptime in days
+	graph_scale no
+	graph_category system
+	uptime.label uptime
+	uptime.draw AREA
+EOF
+;;
+processes)
+cat <<-EOF
+	graph_title Process Statistics
+	graph_args --base 1000 -l 0
+	graph_vlabel number of processes
+	graph_category system
+	graph_info This graph monitors the number of running processes and LWPs.
+	processes.label The number of processes in the system
+	lwp.label The number of lwp in the system
+	lwp.draw AREA
+	maxprocesses.label The maximum number of processes in the system
+	EOF
+;;
+*)
+    printf "# Unknown plugin %s.\n" "${_plugin}"
+    ;;
+esac
+}
+
+get_sys() {
+    LANG=C LC_ALL=C $@
+}
+
+call_plugin() {
+    _param=$2
+    _plug=$(/usr/bin/find ${PLUGIN_DIR} \( -type l -or -type f \) -name "$1" 2>/dev/null | /usr/bin/head -n 1)
+    [ -z "${_plug}" ] && return 1
+
+    unset in_sect _env _user _command
+    while read -r line; do
+        case ${line## } in
+            \[*\])    case [$1 in ${line%%]*}) in_sect=true;; *) unset in_sect ;; esac
+                      ;;
+            env.*)    [ "${in_sect}" ] || continue
+                      _pref=${line#*env.}
+                      _env="${_env} ${_pref%% *}='${_pref#* }'"
+                      ;;
+            user\ *)  _user=${line#*user }
+                      ;;
+            command\ *) _command=${line#*command }
+                      ;;
+        esac
+    done <<EOF
+${CONFIGS}
+
+EOF
+
+    if [ "${_command}" ]; then
+        # if the command is overridden, do a replace on %c -- I wonder if multiple substitutions are intended
+        case ${_command} in *%c*) _command=${_command%%%c*}${_plug}${_command#*%c};; esac
+    else
+        # if not, just use the command
+        _command="${_plug}"
+    fi
+
+    # attach the config or fetch parameter
+    _command="${_command} ${_param}"
+
+    # if we're required to switch the user and able to do so (root) use su to become this user
+    [ "${_user}" ] && [ $(id -u) -eq 0 ] && _command="/usr/bin/su -m ${_user} -c '${_command}'"
+
+    # prepend environment and run the command
+    eval env ${_env} ${_command}
+
+    return 0
+}
+
+# After function definitions, main() can use them
+main "$@"
+
