@@ -5,6 +5,11 @@
 # want with it, as long as you leave this notice along with the code.
 # Should we meet some day and you find the code is worth it, let's enjoy a beer
 # together.
+#
+# Updated by msaad@lucera.com
+# I agree with the above noted license
+# 
+
 
 PLUGIN_DIR=/opt/local/etc/munin/plugins
 CONFIG_DIR=/opt/local/etc/munin/configs
@@ -68,7 +73,7 @@ processes)
     printf "maxprocesses.value %d\n" $(echo max_nprocs/D | mdb -k  |awk '/[0-9].*/ {print $NF}')
     ;;
 iostat)
-    for d in $(/usr/bin/iostat -xz | awk '{print $1}' |egrep  -v 'device|extended'| /usr/bin/xargs); do
+    for d in $(/usr/bin/iostat -xn |awk '{print $NF}' |egrep -v 'device|statistics'| /usr/bin/xargs); do
         set -- $(/usr/bin/iostat -Idx ${d} | /usr/bin/tail -n 1 | /usr/bin/xargs)
         printf "${d}_read.value %d\n${d}_write.value %d\n" "${4%.*}" "${5%.*}"
     done
@@ -101,7 +106,7 @@ cat <<-EOF
 EOF
 ;;
 iostat)
-    drives=$(/usr/bin/iostat -xz | awk '{print $1}' |egrep  -v 'device|extended'| /usr/bin/xargs)
+    drives=$(/usr/bin/iostat -xn |awk '{print $NF}' |egrep -v 'device|statistics'| /usr/bin/xargs)
 cat <<-EOF
 	graph_title IOstat by bytes
 	graph_args --base 1024 -l 0
