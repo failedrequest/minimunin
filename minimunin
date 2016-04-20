@@ -68,7 +68,7 @@ uptime)
       printf "uptime.value %d\n"   $(uptime |awk '{print $3}')
     ;;
 processes)
-    printf "processes.value %d\n" $(/usr/bin/ps -ax | /usr/bin/wc -l)
+    printf "processes.value %d\n" $(/usr/ucb/ps -ax | /usr/bin/wc -l)
     printf "lwp.value %d\n" $(/usr/bin/ps -elcL| wc -l)
     printf "maxprocesses.value %d\n" $(echo maxusers/D |mdb -k |awk '/[0-9].*/ {print 10+(16*$NF)}') 
     ;;
