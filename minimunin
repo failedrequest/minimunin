@@ -151,13 +151,9 @@ cat <<-EOF
 	graph_vlabel number of processes
 	graph_category system
 	graph_info This graph monitors the number of running processes and LWPs.
-        graph_order processes lwp maxprocesses
 	processes.label The number of processes in the system
-        processes.draw AREA
 	lwp.label The number of lwp in the system
-	lwp.draw STACK
 	maxprocesses.label The maximum number of processes in the system
-        maxprocesses.draw STACK
 	EOF
 ;;
 *)
