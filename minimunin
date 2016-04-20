@@ -65,12 +65,12 @@ load)
     printf "load.value %s\n"     $(uptime | awk '{print $(NF-2)}'|sed 's/,//g')
     ;;
 uptime)
-      printf "uptime.value %d\n"   $(kstat -p unix:0:system_misc:boot_time | nawk '{printf "%d\n", srand()-$2}')
+      printf "uptime.value %d\n"   $(uptime |awk '{print $3}')
     ;;
 processes)
-    printf "processes.value %d\n" $(/usr/bin/ps | /usr/bin/wc -l)
+    printf "processes.value %d\n" $(/usr/bin/ps -ax | /usr/bin/wc -l)
     printf "lwp.value %d\n" $(/usr/bin/ps -elcL| wc -l)
-    printf "maxprocesses.value %d\n" $(echo max_nprocs/D | mdb -k  |awk '/[0-9].*/ {print $NF}')
+    printf "maxprocesses.value %d\n" $(echo maxusers/D |mdb -k |awk '/[0-9].*/ {print 10+(16*$NF)}') 
     ;;
 iostat)
     for d in $(/usr/bin/iostat -xn |awk '{print $NF}' |egrep -v 'device|statistics'| /usr/bin/xargs); do
