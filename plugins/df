@@ -1,0 +1,42 @@
+#!/bin/bash
+
+
+. /opt/local/etc/munin/template/plugin.sh
+
+DF=${df:-/usr/sbin/df}
+TAIL=/usr/bin/tail
+warning=${warning:-92}
+critical=${critical:-98}
+
+if [ "$1" = 'autoconf' ]; then
+    echo yes
+    exit 0
+fi
+
+if [ "$1" = "config" ]; then
+
+    echo 'graph_title Disk usage in percent'
+    echo 'graph_args --upper-limit 100'
+    echo 'graph_category disk'
+    echo 'graph_scale no'
+
+  vmadm list |fgrep -v UUID |while read uuid type ram state name
+    do
+      df -k -l zones/$uuid | tail +2 | while read zdev size used avail pct mnt; do
+        echo "$name.label $mnt/$uuid"
+        print_warning $name
+        print_critical $name
+    done
+   done
+    exit 0
+fi
+
+
+
+  vmadm list |fgrep -v UUID |while read uuid type ram state name
+    do
+      df -k -l zones/$uuid | tail +2 | while read zdev size used avail pct mnt; do
+        echo "$name.value $pct" | cut -f1 -d%
+    done
+   done
+
