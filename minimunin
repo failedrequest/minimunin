@@ -70,10 +70,10 @@ uptime)
 processes)
     printf "processes.value %d\n" $(/usr/ucb/ps -ax | /usr/bin/wc -l)
     printf "lwp.value %d\n" $(/usr/bin/ps -elcL| wc -l)
-    printf "maxprocesses.value %d\n" $(echo maxusers/D |mdb -k |awk '/[0-9].*/ {print 10+(16*$NF)}') 
+    #printf "maxprocesses.value %d\n" $(echo maxusers/D |mdb -k |awk '/[0-9].*/ {print 10+(16*$NF)}') 
     ;;
 iostat)
-    for d in $(/usr/bin/iostat -xn |awk '{print $NF}' |egrep -v 'device|statistics'| /usr/bin/xargs); do
+    for d in $(/usr/bin/iostat -xn |awk '{print $NF}' |egrep -v 'device|statistics|lofi|ramdisk'| /usr/bin/xargs); do
         set -- $(/usr/bin/iostat -Idx ${d} | /usr/bin/tail -n 1 | /usr/bin/xargs)
         printf "${d}_read.value %d\n${d}_write.value %d\n" "${4%.*}" "${5%.*}"
     done
@@ -106,12 +106,14 @@ cat <<-EOF
 EOF
 ;;
 iostat)
-    drives=$(/usr/bin/iostat -xn |awk '{print $NF}' |egrep -v 'device|statistics'| /usr/bin/xargs)
+    drives=$(/usr/bin/iostat -xn |awk '{print $NF}' |egrep -v 'device|statistics|lofi|ramdisk'| /usr/bin/xargs)
 cat <<-EOF
 	graph_title IOstat by bytes
 	graph_args --base 1024 -l 0
 	graph_vlabel MB per second read+written
 	graph_category disk
+	graph_scale yes
+	graph_width 600
 	graph_info This graph shows the I/O to and from block devices
 EOF
     printf "graph_order"
@@ -152,8 +154,11 @@ cat <<-EOF
 	graph_category system
 	graph_info This graph monitors the number of running processes and LWPs.
 	processes.label The number of processes in the system
+	processes.draw LINE1
 	lwp.label The number of lwp in the system
-	maxprocesses.label The maximum number of processes in the system
+	lwp.draw LINE1
+	#maxprocesses.label The maximum number of processes in the system
+	#maxprocesses.draw LINE1
 	EOF
 ;;
 *)
