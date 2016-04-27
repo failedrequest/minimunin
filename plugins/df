@@ -24,8 +24,8 @@ if [ "$1" = "config" ]; then
     do
       df -k -l zones/$uuid | tail +2 | while read zdev size used avail pct mnt; do
         echo "$name.label $mnt/$uuid"
-        print_warning $name
-        print_critical $name
+        print_warning 
+        print_critical 
     done
    done
     exit 0
