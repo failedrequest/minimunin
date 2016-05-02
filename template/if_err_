@@ -41,7 +41,7 @@ GPLv2
 
 . /opt/custom/munin/template/plugin.sh
 
-INTERFACE=${0##*/if_}
+INTERFACE=${0##*/if_err_}
 
 if [ "$1" = "autoconf" ]; then
 	if [ -x /usr/bin/kstat ]; then
