@@ -88,8 +88,4 @@ if [ "$1" = "config" ]; then
 	exit 0
 fi;
 
-kstat -p -m '/^(?!unix)/' -n $INTERFACE -s '/^([io]errors|collisions)$/' | awk -F: '
-{
-	split($4, four, "\t")
-	print four[1] ".value", four[2]
-}'
+kstat -p -n $INTERFACE -s '/^([io]errors|collisions)$/' | awk -F: '!/^unix/ {split($4, four, "\t"); print four[1] ".value", four[2] }'
