@@ -1,7 +1,7 @@
 #!/bin/bash
 
 
-. /opt/local/etc/munin/template/plugin.sh
+. /opt/custom/munin/template/plugin.sh
 
 DF=${df:-/usr/sbin/df}
 TAIL=/usr/bin/tail
@@ -18,7 +18,7 @@ if [ "$1" = "config" ]; then
     echo 'graph_title Disk usage in percent'
     echo 'graph_args --upper-limit 100'
     echo 'graph_category disk'
-    echo 'graph_scale no'
+    echo 'graph_scale yes'
 
   vmadm list |fgrep -v UUID |while read uuid type ram state name
     do
