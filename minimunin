@@ -11,8 +11,8 @@
 # 
 
 
-PLUGIN_DIR=/opt/local/etc/munin/plugins
-CONFIG_DIR=/opt/local/etc/munin/configs
+PLUGIN_DIR=/opt/custom/munin/plugins
+CONFIG_DIR=/opt/custom/munin/configs
 BUILTIN="processes load iostat uptime"
 
 # list plugins, read configs
