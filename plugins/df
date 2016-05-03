@@ -19,6 +19,7 @@ if [ "$1" = "config" ]; then
     echo 'graph_args --upper-limit 100'
     echo 'graph_category disk'
     echo 'graph_scale yes'
+    echo 'graph_width 600'
 
   vmadm list |fgrep -v UUID |while read uuid type ram state name
     do
