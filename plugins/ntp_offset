@@ -84,7 +84,7 @@ EOF
     esac
 }
 
-do_ () {
+do_fetch () {
     # Fetch operation
     syspeer="$(ntpq -n -p | grep '^[*o]')"
 
@@ -103,8 +103,12 @@ jitter.value $jitter
 EOF
 }
 
+do_ () {
+  do_fetch 
+}
+
 case $1 in
-    autoconf|config|'')
+    autoconf|config|fetch|'')
        do_$1
        exit $?
        ;;
