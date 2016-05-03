@@ -41,7 +41,7 @@ echo $zlist | tr ' ' '\n' | while read iz; do
         *) name=`echo $iz | awk '{ gsub("[^a-zA-Z0-9_]", "_", $1); print $1 }'` ;;
         esac
         echo -n $name'_read.value '
-        grep $zlabel $ztmp|awk '/M/ {print $6*1000; exit 0)}; /K/ {print $6; exit 0}; /[0-9]$/ {print $6/1000; exit 0}'|sed 's/[^0-9,\.]*//g'
+        grep $zlabel $ztmp|awk '/M/ {print $6*1000; exit 0}; /K/ {print $6; exit 0}; /[0-9]$/ {print $6/1000; exit 0}'|sed 's/[^0-9,\.]*//g'
         echo -n $name'_write.value '
         grep $zlabel $ztmp|awk '/M/ {print $7*1000; exit 0}; /K/ {print $7; exit 0}; /[0-9]$/ {print $7/1000; exit 0}'|sed 's/[^0-9,\.]*//g'
 done

@@ -22,8 +22,8 @@ if [ "$1" = "config" ]; then
 
   vmadm list |fgrep -v UUID |while read uuid type ram state name
     do
-      df -k -l zones/$uuid | tail +2 | while read zdev size used avail pct mnt; do
-        echo "$name.label $mnt/$uuid"
+      df -k -l /zones/$uuid | tail +2 | while read zdev size used avail pct mnt; do
+        echo "$name.label $name - $uuid"
         print_warning 
         print_critical 
     done
@@ -35,7 +35,7 @@ fi
 
   vmadm list |fgrep -v UUID |while read uuid type ram state name
     do
-      df -k -l zones/$uuid | tail +2 | while read zdev size used avail pct mnt; do
+      df -k -l /zones/$uuid | tail +2 | while read zdev size used avail pct mnt; do
         echo "$name.value $pct" | cut -f1 -d%
     done
    done
