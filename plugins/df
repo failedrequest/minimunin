@@ -25,10 +25,13 @@ if [ "$1" = "config" ]; then
     do
       df -k -l /zones/$uuid | tail +2 | while read zdev size used avail pct mnt; do
         echo "$name.label $name - $uuid"
-        print_warning 
-        print_critical 
+        print_warning
+        print_critical
+      done
     done
-   done
+    echo "zones.label system zpool"
+    print_warning
+    print_critical
     exit 0
 fi
 
@@ -40,4 +43,4 @@ fi
         echo "$name.value $pct" | cut -f1 -d%
     done
    done
-
+   echo "zones.value $(df -k -l /zones |tail +2 |awk '{print $5}' |cut -f1 -d%)"
