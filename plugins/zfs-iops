@@ -9,7 +9,7 @@ fi
 
 if [ "$1" = "config" ]; then
 
-    echo 'graph_title ZFS - IOPS '
+    echo 'graph_title ZFS - Throughput in IOPS '
     echo 'graph_category disk'
     echo 'graph_scale yes'
     echo 'graph_width 600'
