@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+
+. /opt/custom/munin/template/plugin.sh
+
+if [ "$1" = 'autoconf' ]; then
+    echo yes
+    exit 0
+fi
+
+if [ "$1" = "config" ]; then
+
+    echo 'graph_title ZFS - ARC Usage '
+    echo 'graph_category disk' 
+    echo 'graph_scale yes'
+    echo 'graph_width 600'
+
+    echo "arc_size.label ARC Size"
+    echo "arc_size.draw AREA"
+    echo "arc_size.colour CCCCCC"
+    echo "arc_meta_max.label ARC Meta Max"
+    echo "arc_meta_max.draw LINE2"
+    echo "arc_meta_used.label ARC Meta Used"
+    echo "arc_meta_used.draw LINE2"
+    echo "arc_meta_limit.label Arc Meta Limit"
+    echo "arc_meta_limit.draw LINE2"
+    echo "arc_c_max.label ARC C Max"
+    echo "arc_c_max.draw LINE2"
+    echo "arc_c_max.colour COLOUR3"
+    exit 0
+fi
+
+echo "arc_meta_max.value $(echo ::arc | mdb -k| grep arc_meta_max|tr -cd '[:digit:]')"
+echo "arc_meta_used.value  $(echo ::arc | mdb -k| grep arc_meta_used|tr -cd '[:digit:]')"
+echo "arc_size.value $(echo ::arc | mdb -k| grep -w size|tr -cd '[:digit:]')"
+echo "arc_meta_limit.value $(echo ::arc | mdb -k| grep arc_meta_limit|tr -cd '[:digit:]')"
+echo "arc_c_max.value $(echo ::arc | mdb -k| grep c_max|tr -cd '[:digit:]')"
+

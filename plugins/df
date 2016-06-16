@@ -43,4 +43,4 @@ fi
         echo "$name.value $pct" | cut -f1 -d%
     done
    done
-   echo "zones.value $(df -k -l /zones |tail +2 |awk '{print $5}' |cut -f1 -d%)"
+   echo "zones.value $(zpool list -H -o capacity|cut -d % -f 1)"

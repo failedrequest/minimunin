@@ -9,15 +9,21 @@ fi
 
 if [ "$1" = "config" ]; then
 
-    echo 'graph_title ZFS - Throughput in IOPS '
-    echo 'graph_category disk'
+    echo 'graph_title ZFS - IOPS '
+    echo 'graph_category disk' 
     echo 'graph_scale yes'
     echo 'graph_width 600'
 
     echo "vopstats_zfs-nread.label Reads"
+    echo "vopstats_zfs-nread.colour COLOUR10"
+    echo "vopstats_zfs-nread.draw AREA"
     echo "vopstats_zfs-nwrite.label Writes"
+    echo "vopstats_zfs-nwrite.colour COLOUR9"
+    echo "vopstats_zfs-nwrite.draw STACK"
     exit 0
 fi
 
 echo "vopstats_zfs-nread.value $(kstat -p ::vopstats_zfs:nread | cut -s -f 2)"
 echo "vopstats_zfs-nwrite.value $(kstat -p ::vopstats_zfs:nwrite | cut -s -f 2)"
+
+
