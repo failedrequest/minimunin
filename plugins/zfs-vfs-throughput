@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+
+. /opt/custom/munin/template/plugin.sh
+
+if [ "$1" = 'autoconf' ]; then
+    echo yes
+    exit 0
+fi
+
+if [ "$1" = "config" ]; then
+
+    echo 'graph_title ZFS - VFS Throughput in Bytes '
+    echo 'graph_category disk'
+    echo 'graph_scale yes'
+    echo 'graph_width 600'
+
+    echo "vopstats_zfs_read_bytes.label Read Rate"
+    echo "vopstats_zfs_write_bytes.label Write Rate"
+    exit 0
+fi
+
+echo "vopstats_zfs_read_bytes.value $(kstat -p ::vopstats_zfs:read_bytes | cut -s -f 2)"
+echo "vopstats_zfs_write_bytes.value $(kstat -p ::vopstats_zfs:write_bytes | cut -s -f 2)"
