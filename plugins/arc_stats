@@ -6,25 +6,24 @@ if [ "$1" = 'autoconf' ]; then
     echo yes
     exit 0
 fi
- 
+
 if [ "$1" = "config" ]; then
- 
+
     echo 'graph_title ZFS - ARC Usage '
-    echo 'graph_args --upper-limit 100'
-    echo 'graph_category disk'
+    echo 'graph_category filesystem'
     echo 'graph_scale yes'
- 
-    echo "arc_meta_max.label"
-    echo "arc_meta_max.draw area"
-    echo "arc_meta_used.label"
-    echo "arc_size.label"
-    echo "arc_meta_limit.label"
-    echo "arc_c_max.label"
+    echo 'graph_width 600'
+
+    echo "arc_meta_max.label ARC Meta Max"
+    echo "arc_meta_used.label ARC Meta Used"
+    echo "arc_size.label ARC Size"
+    echo "arc_meta_limit.label Arc Meta Limit"
+    echo "arc_c_max.label ARC C Max"
     exit 0
 fi
- 
-arc_meta_max = $(echo ::arc | mdb -k| grep arc_meta_max|tr -cd '[:digit:]')
-arc_meta_used = $(echo ::arc | mdb -k| grep arc_meta_used|tr -cd '[:digit:]')
-arc_size = $(echo ::arc | mdb -k| grep -w size|tr -cd '[:digit:]')
-arc_meta_limit = $(echo ::arc | mdb -k| grep arc_meta_limit|tr -cd '[:digit:]')
-arc_c_max = $(echo ::arc | mdb -k| grep c_max|tr -cd '[:digit:])
+
+echo "arc_meta_max.value $(echo ::arc | mdb -k| grep arc_meta_max|tr -cd '[:digit:]')"
+echo "arc_meta_used.value  $(echo ::arc | mdb -k| grep arc_meta_used|tr -cd '[:digit:]')"
+echo "arc_size.value $(echo ::arc | mdb -k| grep -w size|tr -cd '[:digit:]')"
+echo "arc_meta_limit.value $(echo ::arc | mdb -k| grep arc_meta_limit|tr -cd '[:digit:]')"
+echo "arc_c_max.value $(echo ::arc | mdb -k| grep c_max|tr -cd '[:digit:]')"
