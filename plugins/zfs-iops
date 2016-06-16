@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+
+. /opt/custom/munin/template/plugin.sh
+
+if [ "$1" = 'autoconf' ]; then
+    echo yes
+    exit 0
+fi
+
+if [ "$1" = "config" ]; then
+
+    echo 'graph_title ZFS - IOPS '
+    echo 'graph_category disk'
+    echo 'graph_scale yes'
+    echo 'graph_width 600'
+
+    echo "vopstats_zfs-nread.label Reads"
+    echo "vopstats_zfs-nwrite.label Writes"
+    exit 0
+fi
+
+echo "vopstats_zfs-nread.value $(kstat -p ::vopstats_zfs:nread | cut -s -f 2)"
+echo "vopstats_zfs-nwrite.value $(kstat -p ::vopstats_zfs:nwrite | cut -s -f 2)"
