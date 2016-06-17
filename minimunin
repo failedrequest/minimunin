@@ -143,6 +143,7 @@ cat <<-EOF
 	graph_scale no
 	graph_category system
 	uptime.label uptime
+	uptime.type DERIVE
 	uptime.draw AREA
 EOF
 ;;

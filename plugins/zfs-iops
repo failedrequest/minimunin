@@ -16,10 +16,12 @@ if [ "$1" = "config" ]; then
 
     echo "vopstats_zfs-nread.label Reads"
     echo "vopstats_zfs-nread.colour COLOUR10"
-    echo "vopstats_zfs-nread.draw AREA"
+    echo "vopstats_zfs-nread.type DERIVE"
+    echo "vopstats_zfs-nread.draw AREASTACK"
     echo "vopstats_zfs-nwrite.label Writes"
+    echo "vopstats_zfs-nwrite.type DERIVE"
     echo "vopstats_zfs-nwrite.colour COLOUR9"
-    echo "vopstats_zfs-nwrite.draw STACK"
+    echo "vopstats_zfs-nwrite.draw AREASTACK"
     exit 0
 fi
 

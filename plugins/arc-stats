@@ -15,9 +15,11 @@ if [ "$1" = "config" ]; then
     echo 'graph_width 600'
 
     echo "arc_hits.label ARC Hits"
-    echo "arc_hits.draw AREA"
+    echo "arc_hits.type DERIVE"
+    echo "arc_hits.draw AREASTACK"
     echo "arc_miss.label ARC Misses"
-    echo "arc_miss.draw LINE2"
+    echo "arc_miss.type DERIVE"
+    echo "arc_miss.draw AREASTACK"
     exit 0
 fi
 

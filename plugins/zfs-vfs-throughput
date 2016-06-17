@@ -14,10 +14,12 @@ if [ "$1" = "config" ]; then
     echo 'graph_scale yes'
     echo 'graph_width 600'
 
-    echo "vopstats_zfs_read_bytes.label Read Rate"
+    echo "vopstats_zfs_read_bytes.label Read "
+    echo "vopstats_zfs_read_bytes.type DERIVE "
     echo "vopstats_zfs_read_bytes.colour 55D6D3"
     echo "vopstats_zfs_read_bytes.draw AREA"
-    echo "vopstats_zfs_write_bytes.label Write Rate"
+    echo "vopstats_zfs_write_bytes.label Write "
+    echo "vopstats_zfs_write_bytes.type DERIVE "
     echo "vopstats_zfs_write_bytes.colour 2175D9"
     echo "vopstats_zfs_write_bytes.draw STACK"
     exit 0

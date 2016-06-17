@@ -27,9 +27,11 @@ if [ "$1" = "config" ]; then
                 *) name=`echo $i | awk '{ gsub("[^a-zA-Z0-9_]", "_", $1); print }'` ;;
                 esac
                 echo $name'_read.label '$i
+                echo $name'_read.draw LINE2 '
                 echo $name'_read.type GAUGE'
                 echo $name'_read.graph no'
                 echo $name'_write.label '$i
+                echo $name'_write.draw LINE2 '
                 echo $name'_write.type GAUGE'
                 echo $name'_write.negative '$name'_read'
         done
