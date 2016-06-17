@@ -22,6 +22,7 @@ if [ "$1" = "config" ]; then
     echo "arc_meta_used.label ARC Meta Used"
     echo "arc_meta_used.draw AREASTACK"
     echo "arc_meta_limit.label Arc Meta Limit"
+    echo "arc_meta_limit.draw AREASTACK"
     echo "arc_c_max.label ARC C Max"
     echo "arc_c_max.draw AREASTACK"
     echo "arc_c_max.colour COLOUR3"
