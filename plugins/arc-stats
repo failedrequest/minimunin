@@ -16,10 +16,10 @@ if [ "$1" = "config" ]; then
 
     echo "arc_hits.label ARC Hits"
     echo "arc_hits.type DERIVE"
-    echo "arc_hits.draw AREASTACK"
+    echo "arc_hits.draw AREA"
     echo "arc_miss.label ARC Misses"
     echo "arc_miss.type DERIVE"
-    echo "arc_miss.draw AREASTACK"
+    echo "arc_miss.draw AREA"
     exit 0
 fi
 

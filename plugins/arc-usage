@@ -15,16 +15,16 @@ if [ "$1" = "config" ]; then
     echo 'graph_width 600'
 
     echo "arc_size.label ARC Size"
-    echo "arc_size.draw AREASTACK"
+    echo "arc_size.draw AREA"
     echo "arc_size.colour CCCCCC"
     echo "arc_meta_max.label ARC Meta Max"
-    echo "arc_meta_max.draw AREASTACK"
+    echo "arc_meta_max.draw AREA"
     echo "arc_meta_used.label ARC Meta Used"
-    echo "arc_meta_used.draw AREASTACK"
+    echo "arc_meta_used.draw AREA"
     echo "arc_meta_limit.label Arc Meta Limit"
-    echo "arc_meta_limit.draw AREASTACK"
+    echo "arc_meta_limit.draw AREA"
     echo "arc_c_max.label ARC C Max"
-    echo "arc_c_max.draw AREASTACK"
+    echo "arc_c_max.draw AREA"
     echo "arc_c_max.colour COLOUR3"
     exit 0
 fi

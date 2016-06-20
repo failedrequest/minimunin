@@ -121,17 +121,17 @@ for d in ${drives}; do printf " %s_read %s_write" "$d" "$d"; done
     printf "\n"
 for d in ${drives}; do
     cat <<-EOF
-		${d}_read.label ${d}
-		${d}_read.type DERIVE
-		${d}_read.max 2000
-		${d}_read.min 0
-		${d}_read.graph no
-		${d}_write.label ${d}
-		${d}_write.info I/O on device ${d}
-		${d}_write.type DERIVE
-		${d}_write.max 2000
-		${d}_write.min 0
-		${d}_write.negative ${d}_read
+                ${d}_read.label ${d}
+                ${d}_read.type DERIVE
+                ${d}_read.max 2000
+                ${d}_read.min 0
+                ${d}_read.graph no
+                ${d}_write.label ${d}
+                ${d}_write.info I/O on device ${d}
+                ${d}_write.type DERIVE
+                ${d}_write.max 2000
+                ${d}_write.min 0
+                ${d}_write.negative ${d}_read
 	EOF
 done
 ;;
