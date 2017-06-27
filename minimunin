@@ -65,7 +65,7 @@ load)
     printf "load.value %s\n"     $(uptime | awk '{print $(NF-2)}'|sed 's/,//g')
     ;;
 uptime)
-      printf "uptime.value %d\n"   $(uptime |awk '{print $3}')
+       /usr/bin/kstat -p unix:0:system_misc:boot_time |awk -v date="$(date "+%s")" '{printf "uptime.value %0.2f\n", ((date -$NF) / (60*60*24))}'
     ;;
 processes)
     printf "processes.value %d\n" $(/usr/ucb/ps -ax | /usr/bin/wc -l)

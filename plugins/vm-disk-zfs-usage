@@ -1,0 +1,43 @@
+#!/bin/bash
+
+
+. /opt/custom/munin/template/plugin.sh
+
+if [ "$1" = 'autoconf' ]; then
+    echo yes
+    exit 0
+fi
+
+if [ "$1" = "config" ]; then
+
+    echo 'graph_title ZFS usage in GB'
+    echo 'graph_category disk'
+    echo 'graph_scale yes'
+    echo 'graph_width 600'
+
+  vmadm list |fgrep -v UUID |while read uuid type ram state name
+    do
+      df -k -l /zones/$uuid | tail +2 | while read zdev size used avail pct mnt; do
+        echo "$name.label $name - $uuid"
+      done
+    done
+    echo "zones.label system zpool"
+    exit 0
+fi
+
+
+ vmadm list |fgrep -v UUID |while read uuid type ram state name
+    do
+     if [ `vmadm get ${uuid} |json brand`  == "kvm" ]
+       then
+        kvmused0=$(zfs get used zones/$uuid-disk0 |tail -n1|awk '$3 ~ /G/ {print $3*1;exit 0}; $3 ~ /T/ {print $3*1024; exit 0}; $3 ~ /M/ {print ($3*1)/1024;exit 0}; $3 ~ /K/ {print ($3*1)/1024^2;exit 0}')
+        kvmused1=$(zfs get used zones/$uuid-disk1 |tail -n1|awk '$3 ~ /G/ {print $3*1;exit 0}; $3 ~ /T/ {print $3*1024; exit 0}; $3 ~ /M/ {print ($3*1)/1024;exit 0}; $3 ~ /K/ {print ($3*1)/1024^2;exit 0}')
+        let "kvmused=kvmused0+kvmused1"
+        echo "$name.value $kvmused"
+    else
+        zoneused=$(zfs get used zones/$uuid |tail -n1|awk '$3 ~ /G/ {print $3*1;exit 0}; $3 ~ /T/ {print $3*1024; exit 0}; $3 ~ /M/ {print ($3*1)/1024;exit 0}; $3 ~ /K/ {print ($3*1)/1024^2;exit 0}')
+        echo "$name.value $zoneused"
+    fi
+ done
+        used=$(zfs get used zones |tail -n1|awk '$3 ~ /G/ {print $3*1;exit 0}; $3 ~ /T/ {print $3*1024; exit 0}; $3 ~ /M/ {print $3/1024;exit 0}; $3 ~ /K/ {print $3/1024^2;exit 0}')
+        echo "zones.value $used"
