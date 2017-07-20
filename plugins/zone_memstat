@@ -1,0 +1,46 @@
+#!/bin/bash
+# Mark Saad msaad@lucera.com
+# This is a memstat plugin to run inside of a solaris / illumos zone
+
+
+
+. /opt/custom/munin/template/plugin.sh
+
+warning=${warning:-92}
+critical=${critical:-98}
+
+if [ "$1" = 'autoconf' ]; then
+    echo yes
+    exit 0
+fi
+
+if [ "$1" = "config" ]; then
+
+    echo 'graph_title Zone Memory usage '
+    echo 'graph_category system'
+    echo 'graph_scale yes'
+    echo 'rss.label Memory In Use in Mb '
+    echo 'cap.label Max Memory Size'
+    echo 'cap.draw STACK'
+    echo 'nover.label Number Times over Memory cap'
+    echo 'pout.label Paged out while over the cap'
+    echo 'swap.label The Mb Swapped against the swap cap'
+    print_warning
+    print_critical
+    exit 0
+fi
+
+
+rss=$(zonememstat -H |awk '{print $2}')
+cap=$(zonememstat -H |awk '{print $3}')
+nover=$(zonememstat -H |awk '{print $4}')
+pout=$(zonememstat -H |awk '{print $5}')
+swap=$(zonememstat -H |awk '{print($6/100)*$3}')
+
+
+
+echo "rss.value $rss"
+echo "cap.value $cap"
+echo "nover.value $nover"
+echo "pout.value $pout"
+echo "swap.value $swap"
