@@ -1,3 +1,6 @@
+#!/bin/sh
+# Mark Saad - msaad@lucera.com
+# Based on original munin plugin but modified for use on Solaris/illumos
 # Plugin to monitor TCP states.
 #
 # Parameters:
@@ -40,13 +43,53 @@ if [ "$1" = "config" ]; then
         echo 'graph_category network'
         echo 'graph_period second'
         echo 'graph_info This graph shows the TCP connections states of all the network interfaces combined.'
-        for i in ESTABLISHED SYN_SENT SYN_RECV FIN_WAIT1 FIN_WAIT2 TIME_WAIT CLOSE CLOSE_WAIT LAST_ACK CLOSING; do
+        for i in LISTEN ESTABLISHED SYN_SENT SYN_RECV FIN_WAIT1 FIN_WAIT2 TIME_WAIT CLOSE CLOSE_WAIT LAST_ACK CLOSING; do
           echo "$i.label $i"
           echo "$i.type GAUGE"
           echo "$i.max 32999"
           echo "$i.min 0"
         done
         exit 0
+
+else
+  netstat -an -P tcp -f inet | awk '{print $NF}' | awk '
+BEGIN{
+  estab = "0";
+  syn_sent = "0";
+  listen = "0";
+  time_wait = "0";
+  closing = "0";
+  closed = "0";
+  last_ack = "0";
+  fin_wait_1 = "0";
+  fin_wait_2 = "0";
+  close_wait = "0";
+}
+
+  /ESTABLISH/           { estab=estab+1 }
+  /SYN_SENT/            { syn_sent=syn_sent+1 }
+  /LISTEN/              { listen=listen+1 }
+  /TIME_WAIT/           { time_wait=time_wait+1 }
+  /CLOSING/             { closing=closing+1 }
+  /CLOSED/              { closed=closed+1 }
+  /LAST_ACK/            { last_ack=last_ack+1 }
+  /FIN_WAIT_1/          { fin_wait_1=fin_wait_1+1 }
+  /FIN_WAIT_2/          { fin_wait_2=fin_wait_2+1 }
+  /CLOSE_WAIT/          { close_wait=close_wait+1 }
+
+END{
+ print "established.value " estab;
+ print "syn_sent.value " syn_send;
+ print "listen.value " listen;
+ print "time_wait.value " time_wait;
+ print "closing.value " closing;
+ print "closed.value " closed;
+ print "last_ack.value " last_ack;
+ print "fin_wait_1.value " fin_wait_1;
+ print "fin_wait_2.value " fin_wait_2;
+ print "close_wait.value " close_wait;
+}
+'
 fi
 
-netstat -n -P tcp -f inet | awk '/^[0-9].*/ { states[$NF]++ } END { for (idx in states) print idx ".value " states[idx] }' 
+
